@@ -44,24 +44,30 @@ teams = range(1,5)
 #loop through creation of teams
 for i in teams:
     
-    #find all the female members
-    femalemembers = confirmed_list.loc[(confirmed_list.Sex == 'F') & (confirmed_list['TeamNum'] == 0)]
-    
-    #randomly sample one female from pool and set the TeamNum
-    confirmed_list.loc[femalemembers.sample(1).index, 'TeamNum'] = i
-    
-    #find the couplenum from the first female chosen for the group
-    couplenum = int(confirmed_list.loc[confirmed_list['TeamNum'] == i, 'CoupleNum'])
-    
-    #find all the members who are Male, not on a team, and have either no CoupleNum or a CoupleNum not equal to the current female
-    malemembers = confirmed_list[(confirmed_list.Sex == 'M') & (confirmed_list['TeamNum'] == 0) & ((confirmed_list['CoupleNum'] != confirmed_list['CoupleNum']) | (confirmed_list['CoupleNum'] != couplenum))]
-    
-    #randomly sample 2 males from pool and set the TeamNum
-    confirmed_list.loc[malemembers.sample(2).index, 'TeamNum'] = i
-    
+    if i != teams[-1]:
+        
+        #find all the female members
+        femalemembers = confirmed_list.loc[(confirmed_list.Sex == 'F') & (confirmed_list['TeamNum'] == 0)]
+        
+        #randomly sample 2 females from pool and set the TeamNum
+        confirmed_list.loc[femalemembers.sample(2).index, 'TeamNum'] = i
+        
+        #find the couplenum from the females chosen for the group
+        couplenum = confirmed_list.loc[confirmed_list['TeamNum'] == i, 'CoupleNum'].values
+        
+        #find all the members who are Male, not on a team, and have either no CoupleNum or a CoupleNum not equal to the current female
+        malemembers = confirmed_list[(confirmed_list.Sex == 'M') & (confirmed_list['TeamNum'] == 0) & ((confirmed_list['CoupleNum'] != confirmed_list['CoupleNum']) | (~confirmed_list['CoupleNum'].isin(couplenum)))]    
+        
+        #randomly sample 3 males from pool and set the TeamNum
+        confirmed_list.loc[malemembers.sample(3).index, 'TeamNum'] = i
+        
     #create a list of who is left
     remainingmembers = confirmed_list.loc[(confirmed_list['TeamNum'] == 0)]
     
+    if i == teams[-1]:
+        
+        confirmed_list.loc[(confirmed_list['TeamNum'] == 0)]['TeamNum'] = i
+        
     #find the number of remainingmembers
     numremaining = len(remainingmembers)
     
@@ -71,50 +77,40 @@ for i in teams:
     #find the number of members
     nummembers = len(teammembers)
     
-    #find the number of females on the team    
-    numfemales = len(confirmed_list.loc[(confirmed_list.Sex == 'F') & (confirmed_list['TeamNum'] == i)])
-    
-    #loop through all of the remainingmembers and randomly order them so they can be looped through
-    for member in confirmed_list.loc[(confirmed_list['TeamNum'] == 0)].sample(numremaining).itertuples():
-        
-        #if there are only limited members remaining 
-        if (numremaining <= (teamsize - nummembers)):
-            
-            pass
-        
-        #if a member is not a couple or does not have a partner on the team
-        elif ((member.CoupleNum != member.CoupleNum) or (0 == sum(teammembers.CoupleNum.isin([member.CoupleNum])))):
-                
-            #if the member is a female and there are already 2 on the team, loop to the next member
-            if  member.Sex == 'F' and (numfemales == 2):
-                
-                continue
-            
-            else:
-                
-                pass
-        
-        else:
-            
-            continue
-        
-        #adds the member to the team
-        confirmed_list.loc[member.Index, 'TeamNum'] = i
-        
-        #update the teammembers                
-        teammembers = confirmed_list.loc[(confirmed_list['TeamNum'] == i)]
-        
-        #update the number of people on the team
-        nummembers = len(teammembers)
-        
-        #if the team has 5 people, move onto the next team
-        if nummembers < 5:
-            
-            continue
-        
-        else:
-            
-            break
+#    #loop through all of the remainingmembers and randomly order them so they can be looped through
+#    for member in confirmed_list.loc[(confirmed_list['TeamNum'] == 0) & (confirmed_list['Sex'] == 'M')].sample(numremaining).itertuples():
+#        
+#        #if there are only limited members remaining 
+#        if (numremaining <= (teamsize - nummembers)):
+#            
+#            pass
+#        
+#        #if a member is not a couple or does not have a partner on the team
+#        elif ((member.CoupleNum != member.CoupleNum) or (0 == sum(teammembers.CoupleNum.isin([member.CoupleNum])))):
+#            
+#            pass
+#        
+#        else:
+#            
+#            continue
+#        
+#        #adds the member to the team
+#        confirmed_list.loc[member.Index, 'TeamNum'] = i
+#        
+#        #update the teammembers                
+#        teammembers = confirmed_list.loc[(confirmed_list['TeamNum'] == i)]
+#        
+#        #update the number of people on the team
+#        nummembers = len(teammembers)
+#        
+#        #if the team has 5 people, move onto the next team
+#        if nummembers < 5:
+#            
+#            continue
+#        
+#        else:
+#            
+#            break
 
 #sort the list by the TeamNum
 confirmed_list = confirmed_list.sort_values(by = 'TeamNum', axis = 0)
