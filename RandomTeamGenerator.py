@@ -68,6 +68,9 @@ for i in teams:
     #find the current team members
     teammembers = confirmed_list.loc[(confirmed_list['TeamNum'] == i)]
     
+    #find the number of members
+    nummembers = len(teammembers)
+    
     #find the number of females on the team    
     numfemales = len(confirmed_list.loc[(confirmed_list.Sex == 'F') & (confirmed_list['TeamNum'] == i)])
     
