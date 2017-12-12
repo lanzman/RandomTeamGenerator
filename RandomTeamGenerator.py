@@ -33,7 +33,7 @@ print('# Guys = ', num_guys)
 
 print('# Girls = ', num_girls)
 
-from random import *
+import random
 
 #sets size of teams
 teamsize = 5
@@ -64,7 +64,17 @@ for i in teams:
     #create a list of who is left
     remainingmembers = confirmed_list.loc[(confirmed_list['TeamNum'] == 0)]
     
-    if i == teams[-1]:
+    #for second to last group
+    if i == teams[-2]:
+        
+        #find all the members who are Male, not on a team, and have either no CoupleNum or a CoupleNum not equal to the current female
+        malemembers = confirmed_list[(confirmed_list.Sex == 'M') & (confirmed_list['TeamNum'] == 0) & ((confirmed_list['CoupleNum'] != confirmed_list['CoupleNum']) | (~confirmed_list['CoupleNum'].isin(couplenum)))]    
+        
+        #randomly sample 1 male from pool and set the TeamNum
+        confirmed_list.loc[malemembers.sample(1).index, 'TeamNum'] = i
+    
+    #sets remaining group to be whoever is left
+    elif i == teams[-1]:
         
         confirmed_list.loc[(confirmed_list['TeamNum'] == 0),['TeamNum']] = i
         
