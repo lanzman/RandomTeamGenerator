@@ -66,7 +66,7 @@ for i in teams:
     
     if i == teams[-1]:
         
-        confirmed_list.loc[(confirmed_list['TeamNum'] == 0)]['TeamNum'] = i
+        confirmed_list.loc[(confirmed_list['TeamNum'] == 0),['TeamNum']] = i
         
     #find the number of remainingmembers
     numremaining = len(remainingmembers)
@@ -126,6 +126,8 @@ print(confirmed_list[confirmed_list.TeamNum == team])
 
 team = 4
 print(confirmed_list[confirmed_list.TeamNum == team])
+
+confirmed_list.to_csv('TeamList.csv')
 
 ###Current state works unless it picks 2 females for each of the first teams.  This results in 0 females to sample from.
 ###Future update should be modified pending num of people.  If staying at 6, sample 2 females and leave last team 4 guys.
