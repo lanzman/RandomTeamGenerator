@@ -1,6 +1,8 @@
 #change current working directory
 import os
 
+##HERE IS A COMMENT FOR JOHN
+
 #set folderlocation for files
 folderloc = "C:\\Users\\mike.lanza\\Downloads"
 
